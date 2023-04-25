@@ -21,14 +21,16 @@
 #ifndef SPVIEW_DEFS_HPP
 #define SPVIEW_DEFS_HPP
 
+#include <cstddef>
+
 namespace spview::defs{
 
-enum ModelType{
+enum ModelType : size_t{
     MODEL_2D,
     MODEL_3D
 };
 
-enum ElementType{
+enum ElementType : size_t{
     TRI3,
     Q4,
     TET4,
