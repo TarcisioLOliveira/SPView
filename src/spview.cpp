@@ -19,38 +19,47 @@
  */
 
 #include <iostream>
-#include <boost/asio.hpp>
 #include "spview.hpp"
+#include "defs.hpp"
 
 namespace spview{
 
 namespace bp = boost::process;
 
-Server::Server():buffer(4096, 0){
+Server::Server(std::string name):
+    pipe_name(name),
+    buffer(4096, 0),
+    client_output(this->ios),
+    data_queue(this->ios, name){
 
-    boost::asio::io_service ios;
 
-    bp::async_pipe ap(ios);
+    this->proc = bp::child("SPView", this->pipe_name,
+                           bp::std_out > client_output,
+                           this->ios);
 
-    this->proc = bp::child("SPView", "",
-                           bp::std_out > ap,
-                           ios);
-
-    boost::asio::async_read(ap, boost::asio::buffer(this->buffer),
+    boost::asio::async_read(client_output, boost::asio::buffer(this->buffer),
                     [this](const boost::system::error_code &ec, std::size_t size){
+                        (void)ec;
+                        (void)size;
                         std::cout << this->buffer;
                     });
 
 
-    ios.run();
-
-    // while (pipe_stream && std::getline(pipe_stream, line) && !line.empty())
-    //     std::cout << line << std::endl;
+    this->ios.run();
 }
 
 Server::~Server(){
     proc.terminate();
 }
 
+void Server::update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data){
+    defs::UpdateViewData d{view_id, tags.size(), data.size()};
+
+    this->data_queue.push(d.serialize());
+    this->data_queue.push(tags);
+    this->data_queue.push(data);
+
+    this->data_queue.send_all();
+}
 
 }
