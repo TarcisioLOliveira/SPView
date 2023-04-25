@@ -70,7 +70,7 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
 
 }
 
-GmshViewHandler* Gmsh::add_view(const std::string& view_name, GmshViewHandler::ViewType view_type, GmshViewHandler::DataType data_type){
+GmshViewHandler* Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type){
     ++this->last_view_tag;
     this->handler_list.emplace_back(std::make_unique<GmshViewHandler>(this->MODEL_NAME, view_name, this->elem_num, this->node_num, this->mat_num, view_type, data_type, this->type, this->last_view_tag));
     return this->handler_list.back().get();

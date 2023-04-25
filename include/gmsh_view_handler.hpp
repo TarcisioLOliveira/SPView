@@ -30,22 +30,8 @@ namespace spview{
 
 class GmshViewHandler{
     public:
-    enum ViewType{
-        ELEMENTAL,
-        NODAL,
-        VECTOR,
-        TENSOR
-    };
 
-    enum DataType{
-        STRESS,
-        MATERIAL,
-        DISPLACEMENT,
-        DENSITY,
-        OTHER
-    };
-
-    GmshViewHandler(const std::string& model_name, const std::string& view_name, size_t elem_num, size_t node_num, size_t mat_color_num, const ViewType view_type, const DataType data_type, defs::ModelType model_type, const size_t view_id);
+    GmshViewHandler(const std::string& model_name, const std::string& view_name, size_t elem_num, size_t node_num, size_t mat_color_num, const defs::ViewType view_type, const defs::DataType data_type, defs::ModelType model_type, const size_t view_id);
     ~GmshViewHandler(){
         this->remove_view();
     }
@@ -65,8 +51,8 @@ class GmshViewHandler{
     }
 
     const std::string model_name;
-    const ViewType view_type;
-    const DataType data_type;
+    const defs::ViewType view_type;
+    const defs::DataType data_type;
 
     private:
     const size_t view_id;

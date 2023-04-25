@@ -36,7 +36,7 @@ class Gmsh{
     inline void start() const {gmsh::initialize();}
 
     void load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes, size_t node_num, size_t elem_num, size_t mat_num, defs::ElementType elem_type, defs::ModelType type);
-    GmshViewHandler* add_view(const std::string& view_name, GmshViewHandler::ViewType view_type, GmshViewHandler::DataType data_type);
+    GmshViewHandler* add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type);
 
     void show();
     inline void hide(){
