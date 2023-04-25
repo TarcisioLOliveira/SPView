@@ -25,8 +25,13 @@
 namespace spview{
 
 DataQueue::DataQueue(boost::asio::io_service& ios, std::string pipe_name):
-    ios(ios), strand(ios), pipe(ios, pipe_name){
+    pipe_name(pipe_name), ios(ios), strand(ios), pipe(ios, pipe_name){
 
+}
+
+DataQueue::~DataQueue(){
+    this->pipe.cancel();
+    this->pipe.close();
 }
 
 void DataQueue::send_all(){
@@ -91,6 +96,8 @@ void DataQueue::send_next(){
 }
 
 void DataQueue::on_end(const boost::system::error_code& error, const size_t bytesTransferred){
+    (void) bytesTransferred;
+
     size_t type = this->queue.front();
     this->queue.pop();
 

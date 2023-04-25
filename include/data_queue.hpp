@@ -33,6 +33,7 @@ namespace spview{
 class DataQueue{
     public:
     DataQueue(boost::asio::io_service& ios, std::string pipe_name);
+    ~DataQueue();
 
     void send_all();
 
@@ -62,6 +63,7 @@ class DataQueue{
         DOUBLE
     };
 
+    std::string pipe_name;
     boost::asio::io_service& ios;
     boost::asio::io_service::strand strand;
     boost::process::async_pipe pipe;

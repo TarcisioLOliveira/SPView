@@ -30,7 +30,7 @@ Server::Server(std::string name):
     pipe_name(name),
     buffer(4096, 0),
     client_output(this->ios),
-    data_queue(this->ios, name){
+    data_queue(this->ios, "/tmp/"+name){
 
 
     this->proc = bp::child("SPView", this->pipe_name,
@@ -49,7 +49,9 @@ Server::Server(std::string name):
 }
 
 Server::~Server(){
-    proc.terminate();
+    this->client_output.cancel();
+    this->client_output.close();
+    this->proc.terminate();
 }
 
 void Server::update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data){
