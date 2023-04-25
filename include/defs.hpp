@@ -37,6 +37,29 @@ enum ElementType : size_t{
     ET_SIZE
 };
 
+enum ViewType : size_t{
+    ELEMENTAL,
+    NODAL,
+    VECTOR,
+    TENSOR
+};
+
+enum DataType : size_t{
+    STRESS,
+    MATERIAL,
+    DISPLACEMENT,
+    DENSITY,
+    OTHER
+};
+
+enum MessageType : size_t{
+    INIT_CLIENT,
+    ADD_VIEW,
+    REMOVE_VIEW,
+    UPDATE_DATA,
+    CLOSE_CLIENT
+};
+
 }
 
 #endif
