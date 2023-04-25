@@ -22,6 +22,7 @@
 #define SPVIEW_DEFS_HPP
 
 #include <cstddef>
+#include <vector>
 
 namespace spview::defs{
 
@@ -58,6 +59,38 @@ enum MessageType : size_t{
     REMOVE_VIEW,
     UPDATE_DATA,
     CLOSE_CLIENT
+};
+
+struct InitData{
+    ModelType model_type;
+    ElementType element;
+    size_t node_num;
+    size_t elem_num;
+    size_t mat_num;
+
+    inline std::vector<size_t> serialize() const{
+        return {INIT_CLIENT, model_type, element, node_num, elem_num, mat_num};
+    }
+};
+
+struct ViewData{
+    ViewType view_type;
+    DataType data_type;
+    size_t name_size;
+
+    inline std::vector<size_t> serialize() const{
+        return {ADD_VIEW, view_type, data_type, name_size};
+    }
+};
+
+struct UpdateViewData{
+    size_t view_id;
+    size_t tags_size;
+    size_t data_size;
+
+    inline std::vector<size_t> serialize() const{
+        return {UPDATE_DATA, view_id, tags_size, data_size};
+    }
 };
 
 }
