@@ -6,6 +6,7 @@ set(SOURCES_EXEC
 
 set(SOURCES_LIB
     spview.cpp
+    data_queue.cpp
 )
 
 add_library(${LIB_NAME} ${SOURCES_LIB})
