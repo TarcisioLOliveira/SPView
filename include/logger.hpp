@@ -67,14 +67,17 @@ namespace spview::logger{
     }
 
     template<typename T>
-    static void quick_log(T t){
-        std::cout << "SPView: " << t << std::endl;
+    static void quick_log(T t, bool with_prefix = true){
+        if(with_prefix){
+            std::cout << "SPView: ";
+        }
+        std::cout << t << std::endl;
     }
 
     template<typename T, typename ... Args>
     static void quick_log(T t, Args&& ... args){
         std::cout << "SPView: " << t << " ";
-        quick_log(args...);
+        quick_log(args..., false);
     }
 
     template<typename T>
