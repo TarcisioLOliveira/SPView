@@ -23,6 +23,7 @@
 
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include "data_queue.hpp"
 
 namespace spview{
@@ -35,15 +36,16 @@ class Server{
     void update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data);
 
     private:
-    template<typename T>
-    void send_data(const std::vector<T>& data) const;
-
     boost::process::child proc;
     std::string pipe_name;
     std::string buffer;
     boost::asio::io_service ios;
     boost::process::async_pipe client_output;
     DataQueue data_queue;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
+    boost::thread thread;
+
+    void loop();
 };
 
 }

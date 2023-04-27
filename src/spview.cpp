@@ -19,6 +19,7 @@
  */
 
 #include <iostream>
+#include <filesystem>
 #include "spview.hpp"
 #include "defs.hpp"
 
@@ -30,7 +31,8 @@ Server::Server(std::string name):
     pipe_name(name),
     buffer(4096, 0),
     client_output(this->ios),
-    data_queue(this->ios, "/tmp/"+name){
+    data_queue(this->ios, "/tmp/"+name),
+    worker(boost::asio::make_work_guard(this->ios)){
 
 
     this->proc = bp::child("SPView", this->pipe_name,
@@ -45,13 +47,20 @@ Server::Server(std::string name):
                     });
 
 
-    this->ios.run();
+    this->thread = boost::thread(boost::bind(
+                        &Server::loop,
+                        this)
+                    );
 }
 
 Server::~Server(){
     this->client_output.cancel();
     this->client_output.close();
     this->proc.terminate();
+}
+
+void Server::loop(){
+    this->ios.run();
 }
 
 void Server::update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data){

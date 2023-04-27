@@ -19,7 +19,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_library(GMSH_LIB gmsh REQUIRED PATHS /lib64/ /lib64/mpich/lib /lib64/openmpi/lib)
 find_path(GMSH_INC gmsh.h REQUIRED PATHS /usr/include/ /usr/include/mpich-x86_64/)
-find_package(Boost COMPONENTS filesystem REQUIRED)
+find_package(Boost COMPONENTS filesystem thread REQUIRED)
 
 if(WIN32 OR CYGWIN)
     list(APPEND GMSH_LIB winmm wsock32 ws2_32 psapi)

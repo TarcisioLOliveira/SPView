@@ -18,18 +18,28 @@
  *
  */
 
-#include <boost/bind.hpp>
+#include <boost/asio/io_service.hpp>
 #include <iostream>
+#include <boost/bind.hpp>
 #include "data_queue.hpp"
+#include "logger.hpp"
 
 namespace spview{
 
 DataQueue::DataQueue(boost::asio::io_service& ios, std::string pipe_name):
-    pipe_name(pipe_name), ios(ios), strand(ios), pipe(ios, pipe_name){
-
+    pipe_name(pipe_name), ios(ios), strand(ios), pipe(ios, pipe_name),
+    worker(boost::asio::make_work_guard(ios)){
+    this->thread = boost::thread(boost::bind(
+                        &DataQueue::loop,
+                        this)
+                    );
 }
 
 DataQueue::~DataQueue(){
+    this->worker.reset();
+    if(this->thread.joinable()){
+        this->thread.join();
+    }
     this->pipe.cancel();
     this->pipe.close();
 }
@@ -39,23 +49,27 @@ void DataQueue::send_all(){
         return;
     }
 
-    this->strand.post(
+    boost::asio::post(
+        this->strand,
         boost::bind(
             &DataQueue::send_next,
             this
         )
     );
+    //this->ios.run();
 }
 
 void DataQueue::send_next(){
     size_t type = this->queue.front();
 
+    logger::quick_log("sent");
     if(type == STRING){
         const std::string& data = this->string_queue.front();
         boost::asio::async_write(
             this->pipe,
             boost::asio::buffer(data.c_str(), data.size()),
-            this->strand.wrap(
+            boost::asio::bind_executor(
+                this->strand,
                 boost::bind(
                     &DataQueue::on_end,
                     this,
@@ -69,7 +83,8 @@ void DataQueue::send_next(){
         boost::asio::async_write(
             this->pipe,
             boost::asio::buffer(data.data(), data.size()*sizeof(size_t)),
-            this->strand.wrap(
+            boost::asio::bind_executor(
+                this->strand,
                 boost::bind(
                     &DataQueue::on_end,
                     this,
@@ -83,7 +98,8 @@ void DataQueue::send_next(){
         boost::asio::async_write(
             this->pipe,
             boost::asio::buffer(data.data(), data.size()*sizeof(double)),
-            this->strand.wrap(
+            boost::asio::bind_executor(
+                this->strand,
                 boost::bind(
                     &DataQueue::on_end,
                     this,
@@ -108,6 +124,7 @@ void DataQueue::on_end(const boost::system::error_code& error, const size_t byte
     } else if(type == DOUBLE){
         this->double_queue.pop();
     }
+    logger::quick_log("sent");
 
     if(error){
         std::cout << "could not write: " << boost::system::system_error(error).what() << std::endl;
@@ -117,6 +134,10 @@ void DataQueue::on_end(const boost::system::error_code& error, const size_t byte
     if(this->size() > 0){
         this->send_next();
     }
+}
+
+void DataQueue::loop(){
+    this->ios.run();
 }
 
 }

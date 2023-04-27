@@ -21,12 +21,13 @@
 #ifndef SPVIEW_DATA_QUEUE_HPP
 #define SPVIEW_DATA_QUEUE_HPP
 
-#include <boost/asio/io_service.hpp>
 #include <string>
 #include <queue>
 #include <vector>
 #include <boost/asio.hpp>
 #include <boost/process/async_pipe.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/thread.hpp>
 
 namespace spview{
 
@@ -67,10 +68,14 @@ class DataQueue{
     boost::asio::io_service& ios;
     boost::asio::io_service::strand strand;
     boost::process::async_pipe pipe;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
+    boost::thread thread;
     std::queue<DataType> queue;
     std::queue<std::string> string_queue;
     std::queue<std::vector<size_t>> size_t_queue;
     std::queue<std::vector<double>> double_queue;
+
+    void loop();
 
     void send_next();
 
