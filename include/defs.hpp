@@ -54,6 +54,7 @@ enum DataType : size_t{
 };
 
 enum MessageType : size_t{
+    NOTHING,
     INIT_CLIENT,
     ADD_VIEW,
     REMOVE_VIEW,
@@ -79,7 +80,7 @@ struct ViewData{
     size_t name_size;
 
     inline std::vector<size_t> serialize() const{
-        return {ADD_VIEW, view_type, data_type, name_size};
+        return {ADD_VIEW, view_type, data_type, name_size, 0, 0};
     }
 };
 
@@ -89,7 +90,7 @@ struct UpdateViewData{
     size_t data_size;
 
     inline std::vector<size_t> serialize() const{
-        return {UPDATE_DATA, view_id, tags_size, data_size};
+        return {UPDATE_DATA, view_id, tags_size, data_size, 0, 0};
     }
 };
 
