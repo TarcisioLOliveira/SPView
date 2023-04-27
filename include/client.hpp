@@ -18,27 +18,41 @@
  *
  */
 
-#include <thread>
-#include "client.hpp"
+#ifndef SPVIEW_CLIENT_HPP
+#define SPVIEW_CLIENT_HPP
+
+#include <string>
+#include <boost/thread.hpp>
+#include <boost/process.hpp>
+#include <boost/asio.hpp>
 #include "gmsh.hpp"
-#include "gmsh_view_handler.hpp"
-#include "logger.hpp"
 
-int main(int argc, char* argv[]){
-    using namespace spview;
+namespace spview{
 
-    if(argc == 1){
-        logger::quick_log("Error: missing pipe name.");
-        return 1; 
-    }
+class Client{
+    public:
+    static const size_t BUFFER_SIZE = 6;
+    Client(std::string pipe_name);
+    ~Client();
 
-    logger::quick_log("client launched with pipe", argv[1]);
-    Client c(argv[1]);
+    void get_messages();
 
-    c.get_messages();
-    std::this_thread::sleep_for(std::chrono::seconds(20));
-    
-    logger::quick_log("client exited successfully");
+    private:
+    Gmsh* viewer;
+    std::string pipe_name;
+    boost::asio::io_service ios;
+    boost::asio::io_service::strand strand;
+    int pipe_file;
+    boost::asio::posix::stream_descriptor pipe;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
+    boost::thread thread;
+    size_t buffer[BUFFER_SIZE];
 
-    return 0;
+    void get_next_message();
+    void process_message();
+    void loop();
+};
+
 }
+
+#endif

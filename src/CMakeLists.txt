@@ -1,4 +1,5 @@
 set(SOURCES_EXEC
+    client.cpp
     gmsh.cpp
     gmsh_view_handler.cpp
     main.cpp
