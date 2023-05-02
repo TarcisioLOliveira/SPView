@@ -18,8 +18,10 @@
  *
  */
 
+#include <boost/asio/read_until.hpp>
 #include <iostream>
 #include <filesystem>
+#include "logger.hpp"
 #include "spview.hpp"
 #include "defs.hpp"
 
@@ -29,10 +31,11 @@ namespace bp = boost::process;
 
 Server::Server(std::string name):
     pipe_name(name),
-    buffer(4096, 0),
+    buffer(4096),
     client_output(this->ios),
     data_queue(this->ios, "/tmp/"+name),
     worker(boost::asio::make_work_guard(this->ios)){
+}
 
 
 void Server::start(){
@@ -40,13 +43,7 @@ void Server::start(){
                            bp::std_out > client_output,
                            this->ios);
 
-    boost::asio::async_read(client_output, boost::asio::buffer(this->buffer),
-                    [this](const boost::system::error_code &ec, std::size_t size){
-                        (void)ec;
-                        (void)size;
-                        std::cout << this->buffer;
-                    });
-
+    this->stdout_read();
 
     this->thread = boost::thread(boost::bind(
                         &Server::loop,
@@ -54,14 +51,26 @@ void Server::start(){
                     );
 }
 
-Server::~Server(){
-    this->client_output.cancel();
-    this->client_output.close();
-    this->proc.terminate();
-}
-
 void Server::loop(){
     this->ios.run();
+}
+
+void Server::stdout_read(){
+    boost::asio::async_read_until(client_output, this->buffer, '\n',
+                    [this](const boost::system::error_code &ec, std::size_t size){
+                        (void)ec;
+                        (void)size;
+                        std::istream ss(&this->buffer);
+                        std::string line;
+                        while(!ss.eof()){
+                            std::getline(ss, line);
+                            if(line.size() > 0)
+                                std::cout << "SPView: " << line << std::endl;
+                        }
+                        if(this->is_running()){
+                            this->stdout_read();
+                        }
+                    });
 }
 
 void Server::update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data){

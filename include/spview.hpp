@@ -25,6 +25,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include "data_queue.hpp"
+#include "defs.hpp"
 
 namespace spview{
 
@@ -38,7 +39,7 @@ class Server{
     private:
     boost::process::child proc;
     std::string pipe_name;
-    std::string buffer;
+    boost::asio::streambuf buffer;
     boost::asio::io_service ios;
     boost::process::async_pipe client_output;
     DataQueue data_queue;
@@ -46,6 +47,7 @@ class Server{
     boost::thread thread;
 
     void loop();
+    void stdout_read();
 };
 
 }
