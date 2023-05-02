@@ -59,6 +59,10 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
         gmsh::model::mesh::addNodes(3, this->mesh_tag, node_tags, points);
     }
 
+    for(auto& e:elem_nodes){
+        ++e;
+    }
+
     gmsh::model::mesh::addElementsByType(this->mesh_tag, this->to_gmsh_type[elem_type], elem_tags, elem_nodes);
 
     gmsh::option::setNumber("Mesh.SurfaceEdges", 0);
@@ -70,10 +74,16 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
 
 }
 
-GmshViewHandler* Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type){
+void Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type){
     ++this->last_view_tag;
     this->handler_list.emplace_back(std::make_unique<GmshViewHandler>(this->MODEL_NAME, view_name, this->elem_num, this->node_num, this->mat_num, view_type, data_type, this->type, this->last_view_tag));
-    return this->handler_list.back().get();
+}
+
+void Gmsh::update_view(size_t view_id, std::vector<size_t> tags, std::vector<double> data){
+    this->handler_list[view_id]->update_view(data, tags);
+}
+void Gmsh::remove_view(size_t view_id){
+    this->handler_list[view_id].reset();
 }
 
 void Gmsh::show(){
@@ -81,19 +91,16 @@ void Gmsh::show(){
 
     gmsh::fltk::initialize();
 }
-void Gmsh::wait(){
-    auto checkForEvent = [=]() -> bool {
-        std::vector<std::string> action;
-        gmsh::onelab::getString("ONELAB/Action", action);
-        if(action.size() && action[0] == "check") {
-            gmsh::onelab::setString("ONELAB/Action", {""});
-            gmsh::graphics::draw();
-        }
-        return true;
-    };
-
-    while(gmsh::fltk::isAvailable() && checkForEvent() && this->shown)
-        gmsh::fltk::wait();
+void Gmsh::get_events(){
+    std::vector<std::string> action;
+    gmsh::onelab::getString("ONELAB/Action", action);
+    if(action.size() && action[0] == "check") {
+        gmsh::onelab::setString("ONELAB/Action", {""});
+        gmsh::graphics::draw();
+    }
+    if(!gmsh::fltk::isAvailable()){
+        this->end();
+    }
 }
 
 }

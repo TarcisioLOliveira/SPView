@@ -36,7 +36,9 @@ class Gmsh{
     inline void start() const {gmsh::initialize();}
 
     void load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes, size_t node_num, size_t elem_num, size_t mat_num, defs::ElementType elem_type, defs::ModelType type);
-    GmshViewHandler* add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type);
+    void add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type);
+    void update_view(size_t view_id, std::vector<size_t> tags, std::vector<double> data);
+    void remove_view(size_t view_id);
 
     void show();
     inline void hide(){
@@ -48,16 +50,23 @@ class Gmsh{
         }
     }
 
-    void wait();
+    void get_events();
     inline void end(){
-        this->handler_list.clear();
-        this->hide();
-        gmsh::finalize();
+        if(!this->ended){
+            this->handler_list.clear();
+            this->hide();
+            gmsh::finalize();
+            this->ended = true;
+        }
+    }
+    inline bool is_running() const{
+        return !this->ended;
     }
 
     private:
     const std::string MODEL_NAME = "loaded_model";
     bool shown = false;
+    bool ended = false;
     int mesh_tag = 0;
     int last_view_tag = 0;
     defs::ModelType type = defs::MODEL_2D;
