@@ -53,6 +53,10 @@ enum DataType : size_t{
     OTHER
 };
 
+enum BackendOption : size_t{
+    GMSH
+};
+
 enum MessageType : size_t{
     NOTHING,
     INIT_CLIENT,
@@ -68,9 +72,10 @@ struct InitData{
     size_t node_num;
     size_t elem_num;
     size_t mat_num;
+    BackendOption backend;
 
     inline std::vector<size_t> serialize() const{
-        return {INIT_CLIENT, model_type, element, node_num, elem_num, mat_num};
+        return {INIT_CLIENT, model_type, element, node_num, elem_num, mat_num, backend};
     }
 };
 
@@ -80,7 +85,7 @@ struct ViewData{
     size_t name_size;
 
     inline std::vector<size_t> serialize() const{
-        return {ADD_VIEW, view_type, data_type, name_size, 0, 0};
+        return {ADD_VIEW, view_type, data_type, name_size, 0, 0, 0};
     }
 };
 
@@ -90,7 +95,7 @@ struct UpdateViewData{
     size_t data_size;
 
     inline std::vector<size_t> serialize() const{
-        return {UPDATE_DATA, view_id, tags_size, data_size, 0, 0};
+        return {UPDATE_DATA, view_id, tags_size, data_size, 0, 0, 0};
     }
 };
 
