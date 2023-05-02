@@ -37,6 +37,11 @@ Server::Server(std::string name):
     worker(boost::asio::make_work_guard(this->ios)){
 }
 
+Server::~Server(){
+    this->client_output.cancel();
+    this->client_output.close();
+    this->proc.terminate();
+}
 
 void Server::start(){
     this->proc = bp::child("SPViewClient", this->pipe_name,
@@ -73,12 +78,48 @@ void Server::stdout_read(){
                     });
 }
 
-void Server::update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data){
+void Server::init_client(defs::InitData data, const std::vector<double>& points, const std::vector<size_t>& elem_nodes){
+    this->data_queue.push(data.serialize());
+    this->data_queue.push(points);
+    this->data_queue.push(elem_nodes);
+
+    this->data_queue.send_all();
+}
+void Server::add_view(defs::ViewType view_type, defs::DataType data_type, const std::string& name){
+    defs::ViewData d{view_type, data_type, name.size()};
+    logger::quick_log("ADD VIEW SENT!!!!!!!!!!!!");
+
+    this->data_queue.push(d.serialize());
+    this->data_queue.push(name);
+
+    this->data_queue.send_all();
+}
+
+void Server::update_data(size_t view_id, const std::vector<size_t>& tags, const std::vector<double>& data){
     defs::UpdateViewData d{view_id, tags.size(), data.size()};
 
     this->data_queue.push(d.serialize());
     this->data_queue.push(tags);
     this->data_queue.push(data);
+
+    this->data_queue.send_all();
+}
+
+void Server::remove_view(size_t view_id){
+    std::vector<size_t> d(defs::MESSAGE_SIZE, 0);
+    d[0] = defs::REMOVE_VIEW;
+    d[1] = view_id;
+
+    this->data_queue.push(d);
+
+    this->data_queue.send_all();
+}
+
+void Server::close_client(){
+    std::vector<size_t> d(defs::MESSAGE_SIZE, 0);
+    d[0] = defs::CLOSE_CLIENT;
+
+    this->data_queue.push(d);
 
     this->data_queue.send_all();
 }

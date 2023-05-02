@@ -34,7 +34,20 @@ class Server{
     Server(std::string name);
     ~Server();
 
-    void update_data(size_t view_id, std::vector<size_t> tags, std::vector<double> data);
+    void start();
+    void init_client(defs::InitData data, const std::vector<double>& points, const std::vector<size_t>& elem_nodes);
+    void add_view(defs::ViewType view_type, defs::DataType data_type, const std::string& name);
+    void update_data(size_t view_id, const std::vector<size_t>& tags, const std::vector<double>& data);
+    void remove_view(size_t view_id);
+    void close_client();
+
+    inline bool is_running(){
+        return this->proc.running();
+    }
+
+    inline void wait(){
+        this->proc.wait();
+    }
 
     private:
     boost::process::child proc;
