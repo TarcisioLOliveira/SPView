@@ -30,7 +30,8 @@
 
 namespace spview{
 
-Client::Client(std::string pipe_name):
+Client::Client(std::string pipe_name, Gmsh* backend):
+    viewer(backend),
     pipe_name(pipe_name), strand(ios), pipe_file(open(("/tmp/"+pipe_name).c_str(), O_RDONLY)),
     pipe(ios, pipe_file),
     worker(boost::asio::make_work_guard(this->ios)){

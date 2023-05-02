@@ -33,7 +33,8 @@ int main(int argc, char* argv[]){
     }
 
     logger::quick_log("client launched with pipe", argv[1]);
-    Client c(argv[1]);
+    Gmsh viewer;
+    Client c(argv[1], &viewer);
 
     c.get_messages();
     std::this_thread::sleep_for(std::chrono::seconds(20));

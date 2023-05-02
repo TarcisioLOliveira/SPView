@@ -31,7 +31,7 @@ namespace spview{
 
 class Client{
     public:
-    Client(std::string pipe_name);
+    Client(std::string pipe_name, Gmsh* backend);
     ~Client();
 
     void get_messages();
