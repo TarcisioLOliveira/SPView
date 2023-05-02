@@ -62,7 +62,6 @@ void DataQueue::send_all(){
 void DataQueue::send_next(){
     size_t type = this->queue.front();
 
-    logger::quick_log("sent");
     if(type == STRING){
         const std::string& data = this->string_queue.front();
         boost::asio::async_write(
@@ -124,7 +123,6 @@ void DataQueue::on_end(const boost::system::error_code& error, const size_t byte
     } else if(type == DOUBLE){
         this->double_queue.pop();
     }
-    logger::quick_log("sent");
 
     if(error){
         std::cout << "could not write: " << boost::system::system_error(error).what() << std::endl;
