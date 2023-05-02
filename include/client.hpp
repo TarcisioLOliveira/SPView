@@ -36,6 +36,10 @@ class Client{
 
     void get_messages();
 
+    inline bool is_running() const{
+        return this->running;
+    }
+
     private:
     Gmsh* viewer;
     std::string pipe_name;
@@ -46,6 +50,7 @@ class Client{
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
     boost::thread thread;
     size_t buffer[defs::MESSAGE_SIZE];
+    bool running = true;
 
     void get_next_message();
     void process_message();
