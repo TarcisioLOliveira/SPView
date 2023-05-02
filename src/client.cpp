@@ -72,8 +72,29 @@ void Client::get_next_message(){
 }
 
 void Client::process_message(){
-    logger::quick_log("reached");
-    if(this->buffer[0] == defs::UPDATE_DATA){
+    if(this->buffer[0] == defs::INIT_CLIENT){
+        defs::ModelType model_type = static_cast<defs::ModelType>(this->buffer[1]);
+        defs::ElementType elem_type = static_cast<defs::ElementType>(this->buffer[2]);
+        const size_t nodes_per_elem = defs::NODES_PER_ELEMENT[elem_type];
+        std::vector<double> points(this->buffer[3]*3);
+        std::vector<size_t> tags(this->buffer[4]*nodes_per_elem);
+        this->pipe.read_some(
+                          boost::asio::buffer(points, points.size()*sizeof(double)));
+        this->pipe.read_some(
+                          boost::asio::buffer(tags, tags.size()*sizeof(size_t)));
+
+        this->viewer->load_mesh(points, tags, this->buffer[3], this->buffer[4], this->buffer[5], elem_type, model_type);
+    } else if(this->buffer[0] == defs::ADD_VIEW){
+        logger::quick_log("WOOOOOOOOOOOOOORKEEED");
+        std::string name;
+        name.resize(this->buffer[3]);
+        defs::ViewType view_type = static_cast<defs::ViewType>(this->buffer[1]);
+        defs::DataType data_type = static_cast<defs::DataType>(this->buffer[2]);
+        this->pipe.read_some(
+                          boost::asio::buffer(name.data(), name.size()));
+
+        this->viewer->add_view(name, view_type, data_type);
+    } else if(this->buffer[0] == defs::UPDATE_DATA){
         std::vector<size_t> tags(this->buffer[2]);
         std::vector<double> data(this->buffer[3]);
         this->pipe.read_some(
@@ -81,9 +102,14 @@ void Client::process_message(){
         this->pipe.read_some(
                           boost::asio::buffer(data, data.size()*sizeof(double)));
 
-        logger::quick_log("reached");
-        logger::quick_log(tags);
-        logger::quick_log(data);
+        this->viewer->update_view(this->buffer[1], tags, data);
+    } else if(this->buffer[0] == defs::REMOVE_VIEW){
+        this->viewer->remove_view(this->buffer[1]);
+    } else if(this->buffer[0] == defs::CLOSE_CLIENT){
+        this->viewer->end();
+    }
+    if(this->running){
+        this->get_next_message();
     }
 }
 
