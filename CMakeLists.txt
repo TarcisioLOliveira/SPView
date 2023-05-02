@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9.0)
-set(PROJECT_NAME SPView)
+set(PROJECT_NAME SPViewClient)
 set(LIB_NAME spview)
 
 project(${PROJECT_NAME})

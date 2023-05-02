@@ -35,7 +35,8 @@ Server::Server(std::string name):
     worker(boost::asio::make_work_guard(this->ios)){
 
 
-    this->proc = bp::child("SPView", this->pipe_name,
+void Server::start(){
+    this->proc = bp::child("SPViewClient", this->pipe_name,
                            bp::std_out > client_output,
                            this->ios);
 
