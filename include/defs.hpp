@@ -35,7 +35,7 @@ enum ElementType : size_t{
     TRI3,
     Q4,
     TET4,
-    ET_SIZE
+    ELEMENT_TYPE_SIZE
 };
 
 enum ViewType : size_t{

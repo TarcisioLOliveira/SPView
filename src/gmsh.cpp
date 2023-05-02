@@ -29,7 +29,7 @@
 namespace spview{
 
 Gmsh::Gmsh():
-    to_gmsh_type(defs::ET_SIZE){
+    to_gmsh_type(defs::ELEMENT_TYPE_SIZE){
 
     to_gmsh_type[defs::TRI3] = 2;
     to_gmsh_type[defs::Q4] = 3;
