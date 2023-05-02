@@ -26,6 +26,8 @@
 
 namespace spview::defs{
 
+inline const size_t MESSAGE_SIZE = 7;
+
 enum ModelType : size_t{
     MODEL_2D,
     MODEL_3D
