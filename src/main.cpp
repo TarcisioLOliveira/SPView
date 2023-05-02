@@ -34,10 +34,19 @@ int main(int argc, char* argv[]){
 
     logger::quick_log("client launched with pipe", argv[1]);
     Gmsh viewer;
+    viewer.start();
     Client c(argv[1], &viewer);
+    viewer.show();
 
     c.get_messages();
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    while(c.is_running() && viewer.is_running()){
+        viewer.get_events();
+        viewer.redraw();
+    }
+
+    if(viewer.is_running()){
+        viewer.end();
+    }
     
     logger::quick_log("client exited successfully");
 
