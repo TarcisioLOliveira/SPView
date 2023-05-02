@@ -35,8 +35,6 @@ Client::Client(std::string pipe_name):
     pipe(ios, pipe_file),
     worker(boost::asio::make_work_guard(this->ios)){
 
-    std::fill(this->buffer, this->buffer+BUFFER_SIZE, 0);
-
     this->thread = boost::thread(boost::bind(
                         &Client::loop,
                         this)
@@ -60,9 +58,8 @@ void Client::get_messages(){
 }
 
 void Client::get_next_message(){
-    logger::quick_log("reached");
     boost::asio::async_read(this->pipe, 
-        boost::asio::buffer(this->buffer, BUFFER_SIZE*sizeof(size_t)),
+        boost::asio::buffer(this->buffer, defs::MESSAGE_SIZE*sizeof(size_t)),
         boost::asio::bind_executor(
             this->strand,
             boost::bind(
@@ -87,7 +84,6 @@ void Client::process_message(){
         logger::quick_log(tags);
         logger::quick_log(data);
     }
-    std::fill(this->buffer, this->buffer+BUFFER_SIZE, 0);
 }
 
 void Client::loop(){

@@ -31,7 +31,6 @@ namespace spview{
 
 class Client{
     public:
-    static const size_t BUFFER_SIZE = 6;
     Client(std::string pipe_name);
     ~Client();
 
@@ -46,7 +45,7 @@ class Client{
     boost::asio::posix::stream_descriptor pipe;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
     boost::thread thread;
-    size_t buffer[BUFFER_SIZE];
+    size_t buffer[defs::MESSAGE_SIZE];
 
     void get_next_message();
     void process_message();
