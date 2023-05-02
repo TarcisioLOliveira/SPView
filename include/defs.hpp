@@ -40,6 +40,12 @@ enum ElementType : size_t{
     ELEMENT_TYPE_SIZE
 };
 
+inline const size_t NODES_PER_ELEMENT[] = {
+    3, //TRI3
+    4, //Q4
+    4  //TET4
+};
+
 enum ViewType : size_t{
     ELEMENTAL,
     NODAL,
