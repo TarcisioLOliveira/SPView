@@ -87,7 +87,6 @@ void Server::init_client(defs::InitData data, const std::vector<double>& points,
 }
 void Server::add_view(defs::ViewType view_type, defs::DataType data_type, const std::string& name){
     defs::ViewData d{view_type, data_type, name.size()};
-    logger::quick_log("ADD VIEW SENT!!!!!!!!!!!!");
 
     this->data_queue.push(d.serialize());
     this->data_queue.push(name);
@@ -116,12 +115,16 @@ void Server::remove_view(size_t view_id){
 }
 
 void Server::close_client(){
-    std::vector<size_t> d(defs::MESSAGE_SIZE, 0);
-    d[0] = defs::CLOSE_CLIENT;
+    this->client_output.cancel();
+    this->client_output.close();
+    if(this->proc.running()){
+        std::vector<size_t> d(defs::MESSAGE_SIZE, 0);
+        d[0] = defs::CLOSE_CLIENT;
 
-    this->data_queue.push(d);
+        this->data_queue.push(d);
 
-    this->data_queue.send_all();
+        this->data_queue.send_all();
+    }
 }
 
 }

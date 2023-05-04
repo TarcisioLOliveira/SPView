@@ -23,7 +23,15 @@
 
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
+#include <boost/process/error.hpp>
+#include <boost/process/exception.hpp>
+#include <boost/system/detail/error_category.hpp>
+#include <boost/system/detail/error_code.hpp>
+#include <boost/system/detail/system_category.hpp>
+#include <boost/system/system_error.hpp>
 #include <boost/thread.hpp>
+#include <system_error>
+#include "logger.hpp"
 #include "data_queue.hpp"
 #include "defs.hpp"
 
@@ -46,7 +54,13 @@ class Server{
     }
 
     inline void wait(){
-        this->proc.wait();
+        try{
+            this->proc.wait();
+        } catch(boost::process::process_error& e){
+            if(e.code() != boost::system::error_code(10, boost::system::system_category())){
+                logger::quick_log(e.what());
+            }
+        }
     }
 
     private:
