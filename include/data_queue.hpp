@@ -74,6 +74,7 @@ class DataQueue{
     std::queue<std::string> string_queue;
     std::queue<std::vector<size_t>> size_t_queue;
     std::queue<std::vector<double>> double_queue;
+    bool sending = false;
 
     void loop();
 

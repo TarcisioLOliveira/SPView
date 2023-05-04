@@ -45,9 +45,13 @@ DataQueue::~DataQueue(){
 }
 
 void DataQueue::send_all(){
+    if(this->sending){
+        return;
+    }
     if(this->size() == 0){
         return;
     }
+    this->sending = true;
 
     boost::asio::post(
         this->strand,
@@ -66,7 +70,7 @@ void DataQueue::send_next(){
         const std::string& data = this->string_queue.front();
         boost::asio::async_write(
             this->pipe,
-            boost::asio::buffer(data.c_str(), data.size()),
+            boost::asio::buffer(data),
             boost::asio::bind_executor(
                 this->strand,
                 boost::bind(
@@ -81,7 +85,7 @@ void DataQueue::send_next(){
         const std::vector<size_t>& data = this->size_t_queue.front();
         boost::asio::async_write(
             this->pipe,
-            boost::asio::buffer(data.data(), data.size()*sizeof(size_t)),
+            boost::asio::buffer(data),
             boost::asio::bind_executor(
                 this->strand,
                 boost::bind(
@@ -96,7 +100,7 @@ void DataQueue::send_next(){
         const std::vector<double>& data = this->double_queue.front();
         boost::asio::async_write(
             this->pipe,
-            boost::asio::buffer(data.data(), data.size()*sizeof(double)),
+            boost::asio::buffer(data),
             boost::asio::bind_executor(
                 this->strand,
                 boost::bind(
@@ -131,6 +135,8 @@ void DataQueue::on_end(const boost::system::error_code& error, const size_t byte
 
     if(this->size() > 0){
         this->send_next();
+    } else {
+        this->sending = false;
     }
 }
 
