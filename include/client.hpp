@@ -51,6 +51,7 @@ class Client{
     boost::thread thread;
     size_t buffer[defs::MESSAGE_SIZE];
     bool running = true;
+    bool getting_messages = false;
 
     void get_next_message();
     void process_message();

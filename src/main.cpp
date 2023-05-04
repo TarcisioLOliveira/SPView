@@ -18,6 +18,7 @@
  *
  */
 
+#include <gmsh.h>
 #include <thread>
 #include "client.hpp"
 #include "gmsh.hpp"
@@ -31,6 +32,9 @@ int main(int argc, char* argv[]){
         logger::quick_log("Error: missing pipe name.");
         return 1; 
     }
+    //std::cout << "pid: " << getpid() << std::endl;
+    //sleep(15);
+
 
     logger::quick_log("client launched with pipe", argv[1]);
     Gmsh viewer;
@@ -38,8 +42,8 @@ int main(int argc, char* argv[]){
     Client c(argv[1], &viewer);
     viewer.show();
 
-    c.get_messages();
     while(c.is_running() && viewer.is_running()){
+        c.get_messages();
         viewer.get_events();
         viewer.redraw();
     }
