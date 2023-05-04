@@ -29,7 +29,9 @@ GmshViewHandler::GmshViewHandler(const std::string& model_name, const std::strin
       elem_num(elem_num),
       node_num(node_num),
       mat_color_num(mat_color_num),
-      model_type(model_type){
+      model_type(model_type),
+      num_components(this->get_num_components()),
+      data_type_str(this->get_data_type_str()){
 
     gmsh::view::add(view_name, this->view_id);
     if((this->mat_color_num == 2 && data_type == defs::MATERIAL) || data_type == defs::DENSITY){
@@ -46,16 +48,7 @@ void GmshViewHandler::update_view(const std::vector<double>& data, std::vector<s
     for(size_t& t:tags){
         ++t;
     }
-    // Elemental view shouldn't really be used for displacement
-    if(this->view_type == defs::ELEMENTAL){
-        this->update_elemental(data, tags);
-    } else if(this->view_type == defs::NODAL){
-        this->update_nodal(data, tags);
-    } else if(this->view_type == defs::TENSOR){
-        this->update_tensor(data, tags);
-    } else if(this->view_type == defs::VECTOR){
-        this->update_vector(data, tags);
-    }
+    this->gmsh_update_view(data, tags);
 }
 
 }

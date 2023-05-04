@@ -60,22 +60,30 @@ class GmshViewHandler{
     const size_t node_num;
     const size_t mat_color_num;
     defs::ModelType model_type;
+    const size_t num_components;
+    const std::string data_type_str;
     bool removed = false;
 
-    inline void update_elemental(const std::vector<double>& data, const std::vector<size_t>& tags) const{
-        this->gmsh_update_view(data, tags, 1, "ElementData");
+    inline size_t get_num_components() const{
+        if(this->view_type == defs::VECTOR){
+            return 3;
+        } else if(this->view_type == defs::TENSOR){
+            return 9;
+        } else {
+            return 1;
+        }
     }
-    inline void update_nodal(const std::vector<double>& data, const std::vector<size_t>& tags, const int num_components = 1) const{
-        this->gmsh_update_view(data, tags, num_components, "NodeData");
+
+    inline std::string get_data_type_str() const{
+        if(this->view_type == defs::ELEMENTAL){
+            return "ElementData";
+        } else {
+            return "NodeData";
+        }
     }
-    inline void update_vector(const std::vector<double>& data, const std::vector<size_t>& tags) const{
-        this->update_nodal(data, tags, 3);
-    }
-    inline void update_tensor(const std::vector<double>& data, const std::vector<size_t>& tags) const{
-        this->update_nodal(data, tags, 9);
-    }
-    inline void gmsh_update_view(const std::vector<double>& data, const std::vector<size_t>& tags, const int num_components, const std::string& data_type) const{
-        gmsh::view::addHomogeneousModelData(this->view_id, 0, this->model_name, data_type, tags, data, 0, num_components);
+
+    inline void gmsh_update_view(const std::vector<double>& data, const std::vector<size_t>& tags) const{
+        gmsh::view::addHomogeneousModelData(this->view_id, 0, this->model_name, this->data_type_str, tags, data, 0, this->num_components);
     }
 };
 
