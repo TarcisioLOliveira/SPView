@@ -20,20 +20,21 @@
 
 #include <numeric>
 #include "gmsh_view_handler.hpp"
+#include "logger.hpp"
 
 namespace spview{
 
 GmshViewHandler::GmshViewHandler(const std::string& model_name, const std::string& view_name, size_t elem_num, size_t node_num, size_t mat_color_num, const defs::ViewType view_type, const defs::DataType data_type, defs::ModelType model_type, const size_t view_id)
-    : model_name(model_name), view_type(view_type), data_type(data_type), view_id(view_id),
+    : model_name(model_name), view_type(view_type), data_type(data_type), view_id(view_id+1),
       elem_num(elem_num),
       node_num(node_num),
       mat_color_num(mat_color_num),
       model_type(model_type){
 
-    gmsh::view::add(view_name, view_id);
+    gmsh::view::add(view_name, this->view_id);
     if((this->mat_color_num == 2 && data_type == defs::MATERIAL) || data_type == defs::DENSITY){
-        gmsh::view::option::setNumber(view_id, "ColormapNumber", 9); //grayscale
-        gmsh::view::option::setNumber(view_id, "ColormapInvert", 1.0); //inverted
+        gmsh::view::option::setNumber(this->view_id, "ColormapNumber", 9); //grayscale
+        gmsh::view::option::setNumber(this->view_id, "ColormapInvert", 1.0); //inverted
     }
 }
 
