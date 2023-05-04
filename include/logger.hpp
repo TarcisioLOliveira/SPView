@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef LOGGER_HPP
-#define LOGGER_HPP
+#ifndef SPVIEW_LOGGER_HPP
+#define SPVIEW_LOGGER_HPP
 
 #include <string>
 #include <iostream>
