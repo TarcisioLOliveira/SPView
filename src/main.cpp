@@ -43,9 +43,13 @@ int main(int argc, char* argv[]){
     viewer.show();
 
     while(c.is_running() && viewer.is_running()){
-        c.get_messages();
-        viewer.get_events();
-        viewer.redraw();
+        try{
+            c.get_messages();
+            viewer.get_events();
+            viewer.redraw();
+        } catch(std::exception e){
+            logger::quick_log(e.what());
+        }
     }
 
     if(viewer.is_running()){
