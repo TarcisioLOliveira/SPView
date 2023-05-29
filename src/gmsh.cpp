@@ -79,6 +79,7 @@ void Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs
     this->lock.lock();
     ++this->last_view_tag;
     this->handler_list.emplace_back(std::make_unique<GmshViewHandler>(this->MODEL_NAME, view_name, this->elem_num, this->node_num, this->mat_num, view_type, data_type, this->type, this->last_view_tag));
+    gmsh::graphics::draw();
     this->lock.unlock();
     this->updating = false;
 }
@@ -87,6 +88,7 @@ void Gmsh::update_view(size_t view_id, std::vector<size_t> tags, std::vector<dou
     this->updating = true;
     this->lock.lock();
     this->handler_list[view_id]->update_view(data, tags);
+    gmsh::graphics::draw();
     this->lock.unlock();
     this->updating = false;
 }
@@ -94,6 +96,7 @@ void Gmsh::remove_view(size_t view_id){
     this->updating = true;
     this->lock.lock();
     this->handler_list[view_id].reset();
+    gmsh::graphics::draw();
     this->lock.unlock();
     this->updating = false;
 }
@@ -104,18 +107,20 @@ void Gmsh::show(){
     gmsh::fltk::initialize();
 }
 void Gmsh::get_events(){
-    //logger::quick_log("processing events...");
-    //std::vector<std::string> action;
-    //this->lock.lock();
-    //gmsh::onelab::getString("ONELAB/Action", action);
-    //if(action.size() && action[0] == "check") {
-    //    gmsh::onelab::setString("ONELAB/Action", {""});
-    //    gmsh::graphics::draw();
-    //}
-    //if(!gmsh::fltk::isAvailable()){
-    //    this->end();
-    //}
-    //this->lock.unlock();
+    if(!this->updating){
+        this->lock.lock();
+        gmsh::fltk::wait();
+        //std::vector<std::string> action;
+        //gmsh::onelab::getString("ONELAB/Action", action);
+        //if(action.size() && action[0] == "check") {
+        //    gmsh::onelab::setString("ONELAB/Action", {""});
+        //    gmsh::graphics::draw();
+        //}
+        if(!gmsh::fltk::isAvailable()){
+            this->end();
+        }
+        this->lock.unlock();
+    }
 }
 
 }
