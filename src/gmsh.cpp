@@ -34,6 +34,7 @@ Gmsh::Gmsh():
     to_gmsh_type[defs::TRI3] = 2;
     to_gmsh_type[defs::Q4] = 3;
     to_gmsh_type[defs::TET4] = 4;
+    to_gmsh_type[defs::H8] = 5;
 
 }
 
