@@ -37,6 +37,7 @@ enum ElementType : size_t{
     TRI3,
     Q4,
     TET4,
+    TET10,
     H8,
     ELEMENT_TYPE_SIZE
 };
@@ -45,6 +46,7 @@ inline const size_t NODES_PER_ELEMENT[] = {
     3, //TRI3
     4, //Q4
     4, //TET4
+    10, //TET4
     8  //H8
 };
 
