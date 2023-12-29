@@ -73,7 +73,10 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
     gmsh::option::setNumber("General.ColorScheme", 3);
     gmsh::option::setNumber("General.FltkColorScheme", 1);
     gmsh::option::setString("General.GraphicsFontEngine", "StringTexture");
-
+    if(elem_type == defs::ElementType::TET10){
+        gmsh::option::setNumber("View.AdaptVisualizationGrid", 1);
+        gmsh::option::setNumber("View.MaxRecursionLevel", 1);
+    }
 }
 
 void Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type){
