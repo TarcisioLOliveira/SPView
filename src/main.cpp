@@ -19,10 +19,8 @@
  */
 
 #include <gmsh.h>
-#include <thread>
 #include "client.hpp"
 #include "gmsh.hpp"
-#include "gmsh_view_handler.hpp"
 #include "logger.hpp"
 
 int main(int argc, char* argv[]){
@@ -47,7 +45,7 @@ int main(int argc, char* argv[]){
             c.get_messages();
             viewer.get_events();
             viewer.redraw();
-        } catch(std::exception e){
+        } catch(std::exception& e){
             logger::quick_log(e.what());
         }
     }
