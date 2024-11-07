@@ -18,9 +18,8 @@
  *
  */
 
-#include <numeric>
 #include "gmsh_view_handler.hpp"
-#include "logger.hpp"
+#include "defs.hpp"
 
 namespace spview{
 
@@ -37,6 +36,9 @@ GmshViewHandler::GmshViewHandler(const std::string& model_name, const std::strin
     if((this->mat_color_num == 2 && data_type == defs::MATERIAL) || data_type == defs::DENSITY){
         gmsh::view::option::setNumber(this->view_id, "ColormapNumber", 9); //grayscale
         gmsh::view::option::setNumber(this->view_id, "ColormapInvert", 1.0); //inverted
+    }
+    if(data_type == defs::DataType::DISPLACEMENT){
+        gmsh::view::option::setNumber(this->view_id, "VectorType", 5); //displacement view
     }
 }
 
