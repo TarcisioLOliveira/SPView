@@ -44,7 +44,6 @@ int main(int argc, char* argv[]){
         try{
             c.get_messages();
             viewer.get_events();
-            viewer.redraw();
         } catch(std::exception& e){
             logger::quick_log(e.what());
         }

@@ -20,11 +20,9 @@
 
 #include "gmsh.hpp"
 #include <gmsh.h>
-#include <algorithm>
 #include <numeric>
 #include <vector>
 #include "defs.hpp"
-#include "logger.hpp"
 
 namespace spview{
 
@@ -40,6 +38,7 @@ Gmsh::Gmsh():
 }
 
 void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes, size_t node_num, size_t elem_num, size_t mat_num, defs::ElementType elem_type, defs::ModelType type){
+    gmsh::fltk::lock();
     gmsh::clear();
     gmsh::model::add(this->MODEL_NAME);
 
@@ -77,33 +76,32 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
         gmsh::option::setNumber("View.AdaptVisualizationGrid", 1);
         gmsh::option::setNumber("View.MaxRecursionLevel", 1);
     }
+    gmsh::fltk::awake("update");
+    gmsh::fltk::unlock();
 }
 
 void Gmsh::add_view(const std::string& view_name, defs::ViewType view_type, defs::DataType data_type){
-    this->updating = true;
-    this->lock.lock();
+    gmsh::fltk::lock();
     ++this->last_view_tag;
     this->handler_list.emplace_back(std::make_unique<GmshViewHandler>(this->MODEL_NAME, view_name, this->elem_num, this->node_num, this->mat_num, view_type, data_type, this->type, this->last_view_tag));
     gmsh::graphics::draw();
-    this->lock.unlock();
-    this->updating = false;
+    gmsh::fltk::awake("update");
+    gmsh::fltk::unlock();
 }
 
 void Gmsh::update_view(size_t view_id, std::vector<size_t> tags, std::vector<double> data){
-    this->updating = true;
-    this->lock.lock();
+    gmsh::fltk::lock();
     this->handler_list[view_id]->update_view(data, tags);
     gmsh::graphics::draw();
-    this->lock.unlock();
-    this->updating = false;
+    gmsh::fltk::awake("update");
+    gmsh::fltk::unlock();
 }
 void Gmsh::remove_view(size_t view_id){
-    this->updating = true;
-    this->lock.lock();
+    gmsh::fltk::lock();
     this->handler_list[view_id].reset();
     gmsh::graphics::draw();
-    this->lock.unlock();
-    this->updating = false;
+    gmsh::fltk::awake("update");
+    gmsh::fltk::unlock();
 }
 
 void Gmsh::show(){
@@ -112,19 +110,9 @@ void Gmsh::show(){
     gmsh::fltk::initialize();
 }
 void Gmsh::get_events(){
-    if(!this->updating){
-        this->lock.lock();
-        gmsh::fltk::wait();
-        //std::vector<std::string> action;
-        //gmsh::onelab::getString("ONELAB/Action", action);
-        //if(action.size() && action[0] == "check") {
-        //    gmsh::onelab::setString("ONELAB/Action", {""});
-        //    gmsh::graphics::draw();
-        //}
-        if(!gmsh::fltk::isAvailable()){
-            this->end();
-        }
-        this->lock.unlock();
+    gmsh::fltk::wait();
+    if(!gmsh::fltk::isAvailable()){
+        this->end();
     }
 }
 

@@ -27,7 +27,6 @@
 #include <gmsh.h>
 #include "defs.hpp"
 #include "gmsh_view_handler.hpp"
-#include "logger.hpp"
 
 namespace spview{
 
@@ -48,11 +47,7 @@ class Gmsh{
     }
     inline void redraw(){
         if(this->shown){
-            if(!this->updating){
-                this->lock.lock();
-                gmsh::graphics::draw();
-                this->lock.unlock();
-            }
+            gmsh::graphics::draw();
         }
     }
 
@@ -73,11 +68,9 @@ class Gmsh{
     const std::string MODEL_NAME = "loaded_model";
     bool shown = false;
     bool ended = false;
-    bool updating = false;
     int mesh_tag = 0;
     int last_view_tag = 0;
     defs::ModelType type = defs::MODEL_2D;
-    boost::mutex lock;
     size_t node_num;
     size_t elem_num;
     size_t mat_num;
