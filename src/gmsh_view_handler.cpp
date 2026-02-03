@@ -40,6 +40,11 @@ GmshViewHandler::GmshViewHandler(const std::string& model_name, const std::strin
     if(data_type == defs::DataType::DISPLACEMENT){
         gmsh::view::option::setNumber(this->view_id, "VectorType", 5); //displacement view
     }
+    if(data_type == defs::MESH){
+        gmsh::view::option::setNumber(this->view_id, "Light", 0);
+        gmsh::view::option::setNumber(this->view_id, "ShowElement", 1);
+        gmsh::view::option::setNumber(this->view_id, "ColormapNumber", 2);
+    }
 }
 
 

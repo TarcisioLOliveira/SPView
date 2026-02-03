@@ -62,6 +62,7 @@ enum DataType : size_t{
     MATERIAL,
     DISPLACEMENT,
     DENSITY,
+    MESH,
     OTHER
 };
 
