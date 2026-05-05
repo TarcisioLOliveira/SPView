@@ -19,8 +19,10 @@
  */
 
 #include <boost/asio/read_until.hpp>
+#include <chrono>
 #include <iostream>
 #include <filesystem>
+#include <thread>
 #include "logger.hpp"
 #include "spview.hpp"
 #include "defs.hpp"
@@ -38,9 +40,9 @@ Server::Server(std::string name):
 }
 
 Server::~Server(){
-    this->client_output.cancel();
-    this->client_output.close();
-    this->proc.terminate();
+    if(!this->terminated){
+        this->close_client();
+    }
 }
 
 void Server::start(){
@@ -115,8 +117,7 @@ void Server::remove_view(size_t view_id){
 }
 
 void Server::close_client(){
-    this->client_output.cancel();
-    this->client_output.close();
+    this->terminated = true;
     if(this->proc.running()){
         std::vector<size_t> d(defs::MESSAGE_SIZE, 0);
         d[0] = defs::CLOSE_CLIENT;
@@ -124,6 +125,16 @@ void Server::close_client(){
         this->data_queue.push(d);
 
         this->data_queue.send_all();
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    this->data_queue.end();
+    if(!this->ios.stopped()){
+        this->ios.stop();
+        this->thread.join();
+    }
+    if(this->client_output.is_open()){
+        this->client_output.cancel();
+        this->client_output.close();
     }
 }
 

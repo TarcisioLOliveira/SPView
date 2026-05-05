@@ -34,7 +34,7 @@ namespace spview{
 class DataQueue{
     public:
     DataQueue(boost::asio::io_service& ios, std::string pipe_name);
-    ~DataQueue();
+    ~DataQueue() = default;
 
     void send_all();
 
@@ -55,6 +55,17 @@ class DataQueue{
 
     inline size_t size() const{
         return this->queue.size();
+    }
+
+    inline void end(){
+        this->sending = false;
+        this->worker.reset();
+        this->ios.stop();
+        if(this->thread.joinable()){
+            this->thread.join();
+        }
+        this->pipe.cancel();
+        this->pipe.close();
     }
 
     private:

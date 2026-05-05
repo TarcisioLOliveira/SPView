@@ -49,6 +49,10 @@ int main(int argc, char* argv[]){
         }
     }
 
+    if(c.is_running()){
+        c.end();
+    }
+
     if(viewer.is_running()){
         viewer.end();
     }

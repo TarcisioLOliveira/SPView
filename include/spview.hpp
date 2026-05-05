@@ -50,7 +50,7 @@ class Server{
     void close_client();
 
     inline bool is_running(){
-        return this->proc.running();
+        return !this->terminated;
     }
 
     inline void wait(){
@@ -72,6 +72,8 @@ class Server{
     DataQueue data_queue;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> worker;
     boost::thread thread;
+
+    bool terminated = false;
 
     void loop();
     void stdout_read();

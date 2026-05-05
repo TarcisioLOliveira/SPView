@@ -56,6 +56,7 @@ class Gmsh{
         if(!this->ended){
             this->handler_list.clear();
             this->hide();
+            gmsh::fltk::finalize();
             gmsh::finalize();
             this->ended = true;
         }

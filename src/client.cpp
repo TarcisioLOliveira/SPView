@@ -42,12 +42,6 @@ Client::Client(std::string pipe_name, Gmsh* backend):
                     );
 } 
 
-Client::~Client(){
-    this->pipe.cancel();
-    this->pipe.close();
-    close(this->pipe_file);
-}
-
 void Client::get_messages(){
     if(!this->getting_messages){
         this->getting_messages = true;
@@ -59,6 +53,14 @@ void Client::get_messages(){
             )
         );
     }
+}
+
+void Client::end(){
+    this->ios.stop();
+    this->thread.join();
+    this->pipe.cancel();
+    this->pipe.close();
+    close(this->pipe_file);
 }
 
 void Client::get_next_message(){
@@ -108,8 +110,8 @@ void Client::process_message(){
     } else if(this->buffer[0] == defs::REMOVE_VIEW){
         this->viewer->remove_view(this->buffer[1]);
     } else if(this->buffer[0] == defs::CLOSE_CLIENT){
-        this->running = false;
         this->viewer->end();
+        this->running = false;
     }
     this->getting_messages = false;
 }

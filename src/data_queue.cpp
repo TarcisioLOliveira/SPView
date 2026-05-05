@@ -35,15 +35,6 @@ DataQueue::DataQueue(boost::asio::io_service& ios, std::string pipe_name):
                     );
 }
 
-DataQueue::~DataQueue(){
-    this->worker.reset();
-    if(this->thread.joinable()){
-        this->thread.join();
-    }
-    this->pipe.cancel();
-    this->pipe.close();
-}
-
 void DataQueue::send_all(){
     if(this->sending){
         return;

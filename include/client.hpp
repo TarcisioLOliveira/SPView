@@ -32,9 +32,10 @@ namespace spview{
 class Client{
     public:
     Client(std::string pipe_name, Gmsh* backend);
-    ~Client();
+    ~Client() = default;
 
     void get_messages();
+    void end();
 
     inline bool is_running() const{
         return this->running;
