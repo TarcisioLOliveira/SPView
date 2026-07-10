@@ -39,6 +39,10 @@ GmshViewHandler::GmshViewHandler(const std::string& model_name, const std::strin
     }
     if(data_type == defs::DataType::DISPLACEMENT){
         gmsh::view::option::setNumber(this->view_id, "VectorType", 5); //displacement view
+    } else if(view_type == defs::ViewType::VECTOR){
+        gmsh::view::option::setNumber(this->view_id, "VectorType", 4); //3D arrows
+        gmsh::view::option::setNumber(this->view_id, "CenterGlyphs", 1); //center
+        gmsh::view::option::setNumber(this->view_id, "GlyphLocation", 2); //node
     }
     if(data_type == defs::MESH){
         gmsh::view::option::setNumber(this->view_id, "Light", 0);
