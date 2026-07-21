@@ -74,7 +74,8 @@ void Gmsh::load_mesh(std::vector<double> points, std::vector<size_t> elem_nodes,
     gmsh::option::setString("General.GraphicsFontEngine", "StringTexture");
     if(elem_type == defs::ElementType::TET10){
         gmsh::option::setNumber("View.AdaptVisualizationGrid", 1);
-        gmsh::option::setNumber("View.MaxRecursionLevel", 1);
+        gmsh::option::setNumber("View.MaxRecursionLevel", 4);
+        gmsh::option::setNumber("View.TargetError", 1e-2);
     }
     gmsh::fltk::awake("update");
     gmsh::fltk::unlock();
